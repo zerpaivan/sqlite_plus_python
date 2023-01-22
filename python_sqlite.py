@@ -20,8 +20,21 @@ cursor = conn.cursor() # creacion del Objeto cursor
 # )
 
 # Insertar registros en la tabla
-cursor.execute("INSERT INTO CUSTOMERS VALUES ('Ivan', 'Zerpa', 'zerpaivan@gmail.com')")
+# cursor.execute("INSERT INTO CUSTOMERS VALUES ('Ivan', 'Zerpa', 'zerpaivan@gmail.com')")
 
+# insertar multiple registros en una tabla.
+many_customers = [
+    ('Maria', 'Perez', 'perezm77@gmail.com'),
+    ('Pedro', 'Hernadez', 'H_pedrp@outlook.com'),
+    ('Ana','Meza','mezana@gmail.com')
+    ]
+
+# cursor.executemany("INSERT INTO CUSTOMERS VALUES (?,?,?)", many_customers)
+
+#----------------------------------------------------------------------------
+# Query a Fetchall
+cursor.execute("SELECT * FROM CUSTOMERS") # esta es la consulta
+print(cursor.fetchall()) # imprime los valores de la consulta
 
 conn.commit() # como un" push hacia la base de datos
 
