@@ -5,7 +5,7 @@ import sqlite3
 conn = sqlite3.connect("mi_database.db")
 
 # trabajar con una base de datos desde la memoria
-# conn=sqlite3.connect('mi_database.db')
+# conn=sqlite3.connect('mi    _database.db')
 
 # Crear un Tabla de base de datos
 cursor = conn.cursor()  # creacion del Objeto cursor
@@ -59,10 +59,28 @@ many_customers = [
 
 # ------------------------------------------------------------------------------
 #  ordenar una consulta
-cursor.execute("SELECT last_name, first_name FROM CUSTOMERS ORDER BY last_name DESC")
+# cursor.execute("SELECT last_name, first_name FROM CUSTOMERS ORDER BY last_name DESC")
+# rows = cursor.fetchall()
+# for row in rows:
+#     print(row)
+
+# ------------------------------------------------------------------------------
+# Restringir el numero de filas en una consulta LIMIT
+# cursor.execute("SELECT * FROM CUSTOMERS LIMIT 2")
+# rows = cursor.fetchall()
+# for row in rows:
+#     print(row)
+
+# ------------------------------------------------------------------------------
+# Borrar una tabla
+# cursor.execute("DROP TABLE CUSTOMERS")
+cursor.execute("SELECT * FROM CUSTOMERS")
 rows = cursor.fetchall()
 for row in rows:
     print(row)
+# ------------------------------------------------------------------------------
+# Borrar una tabla
+
 
 conn.commit()  # como un" push hacia la base de datos
 
