@@ -5,7 +5,7 @@ import sqlite3
 conn = sqlite3.connect("mi_database.db")
 
 # trabajar con una base de datos desde la memoria
-# conn=sqlite3.connect('mi    _database.db')
+# conn=sqlite3.connect(':memory:')
 
 # Crear un Tabla de base de datos
 cursor = conn.cursor()  # creacion del Objeto cursor
