@@ -12,6 +12,7 @@ class PracticeProblems():
         data = self.cur.execute(my_query)
         # Capturar el nombre de las columnas con despcription
         temp_rows = self.cur.description
+        print(temp_rows, temp_rows[0][0])
         head_rows = tuple(map(lambda x: (x[0],), temp_rows))
         # print('head_rows', head_rows)
         return head_rows

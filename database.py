@@ -39,3 +39,6 @@ def get_beans_by_name(connection, name_bean):
 def get_preparation_for_bean(connection, name_bean):
     with connection:
         return connection.execute(GET_BEST_PREPARATION_FOR_BEAN, (name_bean,)).fetchone()
+
+if __name__ == "__main__":
+    print(type(connect()))

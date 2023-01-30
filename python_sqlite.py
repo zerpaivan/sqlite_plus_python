@@ -40,7 +40,7 @@ many_customers = [
 # fetchall transforma todos los registros la consulta en un array.
 # print(cursor.fetchall())  # imprime los valores de la consulta (array)
 
-# array de la primera sila de la tabla
+# array de la primera fila de la tabla
 # cursor.fetchone() 
 
 # array de las filas indicadas
@@ -74,6 +74,10 @@ many_customers = [
 # ------------------------------------------------------------------------------
 # Borrar una tabla
 # cursor.execute("DROP TABLE CUSTOMERS")
+cursor.execute("""INSERT OR IGNORE INTO CUSTOMERS(first_name, last_name, email) VALUES
+('Petra', 'Camuy', 'camuyP@tumail.com'),
+('Tana', 'Leal', 'TanaL@fmail.com')
+""")
 cursor.execute("SELECT * FROM CUSTOMERS")
 rows = cursor.fetchall()
 for row in rows:
