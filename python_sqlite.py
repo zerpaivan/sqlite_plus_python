@@ -74,10 +74,10 @@ many_customers = [
 # ------------------------------------------------------------------------------
 # Borrar una tabla
 # cursor.execute("DROP TABLE CUSTOMERS")
-cursor.execute("""INSERT OR IGNORE INTO CUSTOMERS(first_name, last_name, email) VALUES
-('Petra', 'Camuy', 'camuyP@tumail.com'),
-('Tana', 'Leal', 'TanaL@fmail.com')
-""")
+# cursor.execute("""INSERT OR IGNORE INTO CUSTOMERS(first_name, last_name, email) VALUES
+# ('Petra', 'Camuy', 'camuyP@tumail.com'),
+# ('Tana', 'Leal', 'TanaL@fmail.com')
+# """)
 cursor.execute("SELECT * FROM CUSTOMERS")
 rows = cursor.fetchall()
 for row in rows:

@@ -14,5 +14,12 @@ myquery_10 = "SELECT firstName, LastName, Title,  BirthDate FROM Employees ORDER
 myquery_11 = "SELECT firstName, LastName, Title,  STRFTIME('%d/%m/%Y', BirthDate) AS BirthDate_ FROM Employees ORDER BY BirthDate ASC"
 myquery_12 = "SELECT FirstName, LastName, (FirstName || ' ' || LastName) AS FullName FROM Employees"
 # myquery_t = "SELECT STRFTIME('%d/%m/%Y', BirthDate)  FROM Employees"
-
-My_solutions.show_query(myquery_12)
+myquery_13 = "SELECT OrderID, ProductID, UnitPrice, Quantity, UnitPrice*Quantity AS TotalPrice FROM 'Order Details' ORDER BY OrderID, ProductID"
+myquery_14 = "SELECT COUNT(DISTINCT CompanyName) FROM CUSTOMERS"
+myquery_15 = "SELECT OrderID, OrderDate FROM Orders ORDER BY OrderDate ASC LIMIT 1"
+myquery_15v2 = "SELECT MIN(OrderDate) AS First_order FROM Orders "
+myquery_16 = "SELECT Country FROM Customers GROUP BY Country ORDER BY Country"
+myquery_17 = "SELECT ContactTitle, COUNT(ContactTitle) AS NCT FROM Customers GROUP BY ContactTitle"
+myquery_18 = """SELECT Products.ProductID, ProductName, CompanyName FROM Products INNER JOIN Suppliers ON Suppliers.SupplierID = Products.SupplierID"""
+My_solutions.show_query(myquery_18)
+# ShippedDate

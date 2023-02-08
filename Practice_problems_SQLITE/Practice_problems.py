@@ -12,7 +12,7 @@ class PracticeProblems():
         data = self.cur.execute(my_query)
         # Capturar el nombre de las columnas con despcription
         temp_rows = self.cur.description
-        print(temp_rows, temp_rows[0][0])
+        # print(temp_rows, temp_rows[0][0])
         head_rows = tuple(map(lambda x: (x[0],), temp_rows))
         # print('head_rows', head_rows)
         return head_rows
@@ -61,7 +61,11 @@ class PracticeProblems():
         # mostrar los registros de la tabla
         for row in rows:
             for field in row:
-                print(f'{field:^{c_width}}', end=" | ")
+                if field is not None:
+                    print('{:^{c_width}}'.format(field, c_width=c_width), end=" | ")
+                else:
+                    print('{:^{c_width}}'.format("None", c_width=c_width), end=" | ")
+
             else:
                 print()
 
