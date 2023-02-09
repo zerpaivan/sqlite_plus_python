@@ -21,5 +21,7 @@ myquery_15v2 = "SELECT MIN(OrderDate) AS First_order FROM Orders "
 myquery_16 = "SELECT Country FROM Customers GROUP BY Country ORDER BY Country"
 myquery_17 = "SELECT ContactTitle, COUNT(ContactTitle) AS NCT FROM Customers GROUP BY ContactTitle"
 myquery_18 = """SELECT Products.ProductID, ProductName, CompanyName FROM Products INNER JOIN Suppliers ON Suppliers.SupplierID = Products.SupplierID"""
-My_solutions.show_query(myquery_18)
+myquery_19 = "SELECT OrderID, STRFTIME('%d/%m/%Y', OrderDate), Shippers.CompanyName FROM Orders INNER JOIN Shippers  ON Orders.ShipVia = Shippers.ShipperID WHERE OrderID > 10247 ORDER BY OrderId"
+My_solutions.show_query(myquery_19)
 # ShippedDate
+# https://parzibyte.me/blog/2020/09/16/generar-diagrama-base-datos-relaciones/ diagrama de relaciones de tabla
