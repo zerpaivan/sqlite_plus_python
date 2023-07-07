@@ -2,7 +2,7 @@
 
 import sqlite3
 # establecer coneccion con la base de datos 
-conn = sqlite3.connect('Practice_problems_SQLITE\\northwind.db')
+conn = sqlite3.connect('C:\\Users\\zerpa\\Documents\\My_SQL\\my_sqlite\\Practice_problems_SQLITE\\northwind.db')
 #  creacion del cursor
 cursor = conn.cursor()
 

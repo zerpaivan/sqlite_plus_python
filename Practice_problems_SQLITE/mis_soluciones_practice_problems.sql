@@ -244,6 +244,8 @@ WHERE Subtotal > 10000;
 */
 
 -- 33
+-- variante del problema original donde se plantea que la condicion es que los clientes tengan compras totales > a 15000
+-- aca se requiere que adicionamente el cliente tenga, por lo menos una orden de mas de 10000
 /*
 SELECT 
 customers.CustomerID,
@@ -268,7 +270,7 @@ GROUP BY Customers.CustomerID;
 */
 
 
-SELECT 
+/*SELECT 
     'Order Details'.OrderID, 
     ORDERS.CustomerID, 
     Customers.CompanyName, Orders.OrderDate, 
@@ -280,11 +282,240 @@ LEFT JOIN Customers
     ON Orders.CustomerID == Customers.CustomerID
 -- WHERE Orders.OrderDate > '2016-12-31' AND Orders.OrderDate <= '2018-12-31'
 GROUP BY 'Order Details'.OrderID, Customers.CustomerID
-HAVING TotalByOrder > 10000 AND 
-    (SELECT sum('Order Details'.Quantity*'Order Details'.UnitPrice) AS TotalBycustomer FROM Customers
+HAVING (TotalByOrder > 5000) AND 
+    ((SELECT sum('Order Details'.Quantity*'Order Details'.UnitPrice) AS TotalBycustomer FROM Customers
     INNER JOIN Orders
     ON Customers.CustomerID == Orders.CustomerID
     INNER JOIN 'Order Details'
     ON Orders.OrderID == 'Order Details'.OrderID
-    GROUP BY Customers.CustomerID) > 10000
+    GROUP BY Customers.CustomerID)) > 1000
 ORDER BY Customers.CustomerID;
+*/
+
+-- 34
+/*
+SELECT 
+    Customers.CustomerID, 
+    Customers.CompanyName,
+    SUM('Order Details'.UnitPrice * 'Order Details'.Quantity) AS TotalsWithoutDiscount,
+    SUM('Order Details'.UnitPrice * 'Order Details'.Quantity *(1-'Order Details'.Discount)) AS TotalsWithDiscount
+FROM Customers
+INNER JOIN Orders
+    ON Customers.CustomerID == Orders.CustomerID
+INNER JOIN 'Order Details'
+    ON Orders.OrderID = 'Order Details'.OrderID
+WHERE Orders.OrderDate >= '2016-01-01' AND Orders.OrderDate < '2017-01-01'
+GROUP BY Customers.CustomerID
+HAVING TotalsWithDiscount > 10000
+ORDER BY TotalsWithDiscount DESC;
+*/
+
+--35
+/*
+SELECT 
+    EmployeeID,
+    OrderID,
+    OrderDate,
+CASE
+    WHEN strftime('%m-%d', OrderDate) == '02-29' THEN TRUE
+    ELSE FALSE
+END AS BISIESTO
+FROM Orders
+WHERE (   
+    (NOT BISIESTO AND strftime('%m-%d', OrderDate) == '02-29') 
+OR
+    (strftime('%m-%d', OrderDate) IN ('01-31', '02-28', '03-31', '04-30', '05-31', '06-30', '07-31', '08-31', '09-30', '10-31', '11-30', '12-31'))
+)
+ORDER BY EmployeeID, OrderID
+*/
+
+-- 36
+/*
+SELECT Orders.OrderID, Count('Order Details'.OrderID) AS TotalOrderDetails FROM Orders
+INNER JOIN 'Order Details'
+ON Orders.OrderID = 'Order Details'.OrderID
+GROUP BY Orders.OrderID
+ORDER BY TotalOrderDetails DESC
+LIMIT 10
+*/
+
+-- 37
+/*
+SELECT OrderID FROM Orders
+ORDER BY RANDOM()
+LIMIT (SELECT ROUND(0.02 * COUNT(OrderID),0) FROM Orders)
+*/
+/*
+SELECT
+DISTINCT(Products.ProductID),
+Orders.OrderID, 
+Orders.EmployeeID,
+Employees.FirstName,
+'Order Details'.Quantity
+from Products
+INNER JOIN 'Order Details'
+ON Products.ProductID == 'Order Details'.ProductID
+INNER JOIN Orders
+ON Orders.OrderID == 'Order Details'.OrderID
+INNER JOIN Employees
+ON Orders.EmployeeID == Employees.EmployeeID
+WHERE 'Order Details'.Quantity >= 60 AND Employees.EmployeeID == 3
+ORDER BY 'Order Details'.ProductID;
+*/
+
+-- 38
+-- respuesta larga.
+/*
+SELECT 
+    'Order Details'.OrderID,
+    COUNT('Order Details'.OrderID) AS N,
+    Products.ProductID,
+    Orders.EmployeeID,
+    Employees.FirstName,
+    'Order Details'.Quantity
+FROM 'Order Details' 
+INNER JOIN Products
+    ON Products.ProductID == 'Order Details'.ProductID
+INNER JOIN Orders
+    ON Orders.OrderID == 'Order Details'.OrderID
+INNER JOIN Employees
+    ON Orders.EmployeeID == Employees.EmployeeID
+WHERE 'Order Details'.Quantity >= 60
+GROUP BY  'Order Details'.OrderID, 'Order Details'.Quantity
+HAVING N > 1
+ORDER BY 'Order Details'.OrderID;
+*/
+
+-- repuesta corta:
+/*Select
+OrderID
+From 'OrderDetails'
+Where Quantity >= 60
+Group By OrderID, Quantity
+Having Count(*) > 1;
+*/
+--Nota: No estoy convencido de la respuesta ya que el error
+-- lo cometio la empleada Janet y este deberia ser un criterio 
+-- para la query. En la solucion planteada por el libro no
+-- toman en cuenta esto
+
+--39
+/*
+WITH Previa AS (
+Select
+    OrderID
+From 'Order Details'
+Where Quantity >= 60
+Group By OrderID, Quantity
+Having Count(*) > 1
+)
+
+SELECT * FROM 'Order Details'
+where OrderID IN Previa
+*/
+
+-- 40
+/*
+Select
+'Order Details'.OrderID,
+ProductID,
+UnitPrice,
+Quantity,
+Discount
+From 'Order Details'
+Join 
+(
+    Select 
+        OrderID
+        From 'Order Details'
+        Where Quantity >= 60
+        Group By OrderID, Quantity
+        Having Count(*) > 1
+) AS T_Orders
+on T_Orders.OrderID = 'Order Details'.OrderID
+Order by 'Order Details'.OrderID, 'Order Details'.ProductID;
+*/
+
+--41
+/*
+SELECT OrderID, OrderDate, RequiredDate, ShippedDate FROM Orders
+WHERE RequiredDate < ShippedDate;
+*/
+-- 42
+/*
+SELECT 
+Orders.EmployeeID,
+Employees.FirstName || ' ' || Employees.LastName AS EmployeeID,
+COUNT(Orders.EmployeeID) AS TotalLateOrders
+FROM Orders
+INNER JOIN
+Employees
+ON Orders.EmployeeID == Employees.EmployeeID
+WHERE  Orders.ShippedDate > Orders.RequiredDate
+GROUP BY Orders.EmployeeID
+ORDER BY TotalLateOrders DESC
+*/
+
+--43
+/*
+WITH
+    OrdersByEmployee AS (
+        SELECT 
+            COUNT(OrderID) AS AllOrders, 
+            EmployeeID 
+            FROM Orders
+            GROUP BY EmployeeID
+    )
+
+SELECT 
+    Orders.EmployeeID,
+    Employees.FirstName || ' ' || Employees.LastName AS Employee,
+    OrdersByEmployee.AllOrders,
+    COUNT(Orders.EmployeeID) AS TotalLateOrders
+FROM Orders
+
+INNER JOIN Employees
+    ON Orders.EmployeeID == Employees.EmployeeID
+
+INNER JOIN OrdersByEmployee
+    ON Orders.EmployeeID == OrdersByEmployee.EmployeeID
+
+WHERE  Orders.ShippedDate > Orders.RequiredDate
+GROUP BY Orders.EmployeeID
+ORDER BY OrdersByEmployee.AllOrders DESC;
+*/
+
+--44
+
+-- la columna TotalLateOrders no presenta valores nulos para la
+-- la condicion Orders.ShippedDate > Orders.RequiredDate
+-- por lo tanto la respuedta difiere con la original
+/*
+WITH
+    OrdersByEmployee AS (
+        SELECT 
+            COUNT(OrderID) AS AllOrders, 
+            EmployeeID 
+            FROM Orders
+            GROUP BY EmployeeID
+    )
+
+SELECT 
+    Orders.EmployeeID,
+    Employees.FirstName || ' ' || Employees.LastName AS Employee,
+    OrdersByEmployee.AllOrders,
+    COUNT(Orders.EmployeeID) AS TotalLateOrders
+FROM Employees
+
+INNER JOIN Orders
+    ON Orders.EmployeeID == Employees.EmployeeID
+
+INNER JOIN OrdersByEmployee
+    ON Orders.EmployeeID == OrdersByEmployee.EmployeeID
+
+WHERE  Orders.ShippedDate > Orders.RequiredDate
+GROUP BY Orders.EmployeeID
+ORDER BY Orders.EmployeeID;
+*/
+SELECT OrderID, EmployeeID, RequiredDate, ShippedDate FROM Orders
+WHERE EmployeeID == 5 AND ShippedDate > RequiredDate
