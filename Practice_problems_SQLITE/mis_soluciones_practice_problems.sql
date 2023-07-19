@@ -485,37 +485,231 @@ GROUP BY Orders.EmployeeID
 ORDER BY OrdersByEmployee.AllOrders DESC;
 */
 
---44
+--44, 45 , 46 Y 47
+/*
+-- se modifica el siguiente campo de la base de datos para que coincida
+-- con los ejercicios del libro:
 
--- la columna TotalLateOrders no presenta valores nulos para la
--- la condicion Orders.ShippedDate > Orders.RequiredDate
--- por lo tanto la respuedta difiere con la original
+-- fecha original 2016-10-18
+UPDATE Orders SET ShippedDate == '2016-10-17'
+WHERE EmployeeID == 5 AND ShippedDate > RequiredDate;
+*/
+
 /*
 WITH
     OrdersByEmployee AS (
-        SELECT 
-            COUNT(OrderID) AS AllOrders, 
-            EmployeeID 
+        SELECT
+            Employees.EmployeeID,
+            Employees.FirstName || ' ' || Employees.LastName AS Employee,
+            COUNT(OrderID) AS AllOrders 
             FROM Orders
-            GROUP BY EmployeeID
+            INNER JOIN Employees
+            ON Orders.EmployeeID == Employees.EmployeeID
+            GROUP BY Employees.EmployeeID
+    ),
+
+    OrdersLateByEmployee AS (
+        SELECT 
+            Orders.EmployeeID,
+            COUNT(Orders.EmployeeID) AS LateOrders
+        FROM Orders
+
+        LEFT JOIN Employees
+            ON Orders.EmployeeID == Employees.EmployeeID
+
+        WHERE  Orders.ShippedDate > Orders.RequiredDate
+        GROUP BY Orders.EmployeeID
+        ORDER BY Orders.EmployeeID
+)
+SELECT 
+OrdersByEmployee.EmployeeID,
+OrdersByEmployee.Employee,
+OrdersByEmployee.AllOrders,
+COALESCE(OrdersLateByEmployee.LateOrders,0) AS LateOrders,
+COALESCE(ROUND(100.0*OrdersLateByEmployee.LateOrders/OrdersByEmployee.AllOrders, 2),0) AS PercentageLateOrders
+FROM OrdersByEmployee
+LEFT JOIN OrdersLateByEmployee
+ON OrdersByEmployee.EmployeeID == OrdersLateByEmployee.EmployeeID;
+*/
+
+--48 y 49
+/*
+WITH TotalbyCustomer AS (
+
+    SELECT
+    Orders.CustomerID, 
+    SUM('Order Details'.UnitPrice * 'Order Details'.Quantity) AS TotalOrder
+    FROM Orders
+    LEFT JOIN 'Order Details'
+    ON Orders.OrderID == 'Order Details'.OrderID
+    WHERE Orders.OrderDate > '2015-12-31' AND Orders.OrderDate <= '2016-12-31'
+    GROUP by Orders.CustomerID
+    
+)
+SELECT *,
+CASE
+    WHEN TotalOrder < 1000 THEN 'low'
+    WHEN TotalOrder < 5000 THEN 'medium'
+    WHEN TotalOrder < 10000 THEN 'high' 
+    ELSE 'Very high'
+END AS CategoryCustomer
+FROM TotalBycustomer
+ORDER BY CategoryCustomer;
+*/
+-- 50
+/*
+WITH 
+TotalbyCustomer AS (
+
+    SELECT
+    Orders.CustomerID, 
+    SUM('Order Details'.UnitPrice * 'Order Details'.Quantity) AS TotalOrder
+    FROM Orders
+    LEFT JOIN 'Order Details'
+    ON Orders.OrderID == 'Order Details'.OrderID
+    WHERE Orders.OrderDate > '2015-12-31' AND Orders.OrderDate <= '2016-12-31'
+    GROUP by Orders.CustomerID
+    
+),
+NumberOfCustomers AS (
+    SELECT
+    COUNT(DISTINCT(Orders.CustomerID)) AS N_customers
+    FROM Orders
+    LEFT JOIN 'Order Details'
+    ON Orders.OrderID == 'Order Details'.OrderID
+    WHERE Orders.OrderDate > '2015-12-31' AND Orders.OrderDate <= '2016-12-31'
+)
+
+SELECT COUNT(CustomerID) AS Number_CategoryCustomer,
+COUNT(CustomerID)/(1.0*N_customers) AS Number_CategoryCustomer,
+CASE
+    WHEN TotalOrder < 1000 THEN 'low'
+    WHEN TotalOrder < 5000 THEN 'medium'
+    WHEN TotalOrder < 10000 THEN 'high' 
+    ELSE 'Very high'
+END AS CategoryCustomer
+FROM TotalBycustomer
+CROSS JOIN NumberOfCustomers
+-- ON TotalBycustomer.TotalOrder == NumberOfCustomers.N_customers
+GROUP BY CategoryCustomer
+ORDER BY CategoryCustomer;
+*/
+
+/*
+SELECT
+COUNT(DISTINCT(Orders.CustomerID)) AS N_customers
+FROM Orders
+LEFT JOIN 'Order Details'
+ON Orders.OrderID == 'Order Details'.OrderID
+WHERE Orders.OrderDate > '2015-12-31' AND Orders.OrderDate <= '2016-12-31'
+*/
+
+-- 52
+/*
+SELECT Customers.Country FROM Customers
+LEFT JOIN Suppliers
+ON Suppliers.Country == Customers.Country
+WHERE Customers.Country IS NOT NULL
+GROUP BY Customers.Country;
+*/
+
+/*
+SELECT Customers.Country FROM Customers
+UNION
+SELECT Suppliers.Country FROM Suppliers;
+*/
+
+-- 53 y 54
+/*
+WITH
+    Countries AS (
+    SELECT Country FROM Customers
+    UNION
+    SELECT Country from Suppliers
+    ),
+
+    CustomersCountry AS (
+    SELECT 
+    Customers.Country AS CC, 
+    COUNT(CustomerID) AS TotalCustomersByCountry 
+    FROM Customers
+    GROUP BY Country
+    ),
+    SuppliersCountry AS( 
+    SELECT Suppliers.Country as SC,
+    COUNT(SupplierID) AS TotalSuppiersByCountry
+    FROM Suppliers
+    GROUP BY country
     )
 
-SELECT 
-    Orders.EmployeeID,
-    Employees.FirstName || ' ' || Employees.LastName AS Employee,
-    OrdersByEmployee.AllOrders,
-    COUNT(Orders.EmployeeID) AS TotalLateOrders
-FROM Employees
-
-INNER JOIN Orders
-    ON Orders.EmployeeID == Employees.EmployeeID
-
-INNER JOIN OrdersByEmployee
-    ON Orders.EmployeeID == OrdersByEmployee.EmployeeID
-
-WHERE  Orders.ShippedDate > Orders.RequiredDate
-GROUP BY Orders.EmployeeID
-ORDER BY Orders.EmployeeID;
+SELECT countries.Country, 
+TotalCustomersByCountry, 
+TotalSuppiersByCountry 
+FROM countries
+LEFT JOIN SuppliersCountry
+on countries.Country == SuppliersCountry.SC
+LEFT JOIN CustomersCountry
+ON countries.Country == CustomersCountry.CC
+order by CustomersCountry.cc
 */
-SELECT OrderID, EmployeeID, RequiredDate, ShippedDate FROM Orders
-WHERE EmployeeID == 5 AND ShippedDate > RequiredDate
+
+--55
+/*
+WITH
+TheTable AS (
+    SELECT
+        ROW_NUMBER() OVER(
+        PARTITION BY ShipCountry
+        ORDER BY OrderDate
+        ) AS RowNum,
+        ShipCountry, 
+        CustomerID, 
+        OrderID, 
+        OrderDate 
+    FROM Orders
+    ORDER by ShipCountry, OrderDate
+)
+SELECT * FROM TheTable
+WHERE RowNum == 1
+*/
+
+--56
+/*
+SELECT
+Orders.CustomerID,
+Orders.OrderID,
+Orders.OrderDate,
+OrdersNextOrder.OrderID as NextOrderID,
+OrdersNextOrder.OrderDate as NextOrderDate,
+julianday(OrdersNextOrder.OrderDate) - julianday(Orders.OrderDate) as DaysBetween
+FROM Orders
+INNER JOIN Orders AS OrdersNextOrder
+ON Orders.CustomerID == OrdersNextOrder.CustomerID
+WHERE
+    Orders.OrderID < NextorderID
+    AND DaysBetween <= 5
+--GROUP BY Orders.OrderID
+ORDER BY orders.CustomerID, Orders.OrderID
+
+*/
+--57
+WITH OrdersNextOrder AS (
+    SELECT 
+    CustomerID,
+    OrderDate,
+    LEAD(OrderDate) 
+    OVER (PARTITION BY CustomerID ORDER BY CustomerID) AS NextOrderDate
+    FROM Orders
+)
+
+SELECT
+CustomerID,
+OrderDate,
+NextOrderDate,
+julianday(NextOrderDate) - julianday(OrderDate) as DaysBetween
+FROM OrdersNextOrder
+WHERE DaysBetween <= 5
+
+
+
+

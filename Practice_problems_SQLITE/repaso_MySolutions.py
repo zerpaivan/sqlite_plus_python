@@ -19,6 +19,9 @@ STRFTIME('%Y', OrderDate) as year
 FROM Orders
 where year = '2016' '''
 
-repaso.read_query(myquery_26) # cargar la query
+myquery_10320 = '''UPDATE Orders SET ShippedDate == '2016-10-17'
+WHERE EmployeeID == 5 AND ShippedDate > RequiredDate'''
+
+repaso.read_query(myquery_10320) # cargar la query
 repaso.show_query() # mostrar la query
 repaso.conn.close()
